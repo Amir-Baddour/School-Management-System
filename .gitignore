@@ -20,3 +20,7 @@ obj/
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
+
+# Ignore Bootstrap files
+/Content/bootstrap*
+/Scripts/bootstrap*
