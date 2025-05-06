@@ -1,0 +1,22 @@
+# Windows image file caches
+Thumbs.db
+
+# User-specific files
+user.config
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ASP.NET temporary files
+bin/
+obj/
+
+# VS Code directory
+.vscode/
+
+# IIS Express
+.vs/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt

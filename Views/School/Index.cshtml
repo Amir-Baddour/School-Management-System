@@ -1,0 +1,13 @@
+﻿@model Testing1.Models.StudentModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Welcome @ViewBag.UserName!</h2>
+
+<br />
+
+<a href="@Url.Action("Student", "School")" class="btn btn-primary">Create User</a>
+<a href="@Url.Action("DisplayStudents", "School")" class="btn btn-success">Display Users</a>
+

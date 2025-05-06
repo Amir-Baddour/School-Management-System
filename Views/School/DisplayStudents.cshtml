@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Testing1.Students>
+@{
+    ViewBag.Title = "Display Students";
+}
+<h2>Registered Students</h2>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Name</th>
+        <th>Gender</th>
+        <th>Address</th>
+        <th>Enrollment Date</th>
+        <th>Email</th>
+        <th>Actions</th>
+    </tr>
+    @foreach (var s in Model)
+    {
+        <tr>
+            <td>@s.Name</td>
+            <td>@s.Gender</td>
+            <td>@s.Address</td>
+            <td>@s.EnrollmentDate.ToShortDateString()</td>
+            <td>@s.email</td>
+            <td>
+                @Html.ActionLink("Edit", "EditStudent", "School", new { id = s.Id }, null)
+            </td>
+        </tr>
+    }
+</table>

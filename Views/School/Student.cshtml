@@ -1,0 +1,119 @@
+﻿@model Testing1.Models.StudentModel
+
+@{
+    ViewBag.Title = "Student";
+}
+
+<h2>Please add Student details</h2>
+<div class="container">
+    <form id="studentForm">
+        @Html.AntiForgeryToken()
+        <table>
+            <tr>
+                <td><label>Name</label></td>
+                <td>
+                    @Html.TextBoxFor(m => m.Name, new { @id = "Name" })
+                </td>
+            </tr>
+            <tr>
+                <td><label>Gender</label></td>
+                <td>
+                    @Html.DropDownListFor(m => m.Gender, new List<SelectListItem>
+                    {
+                        new SelectListItem { Text = "Male", Value = "M" },
+                        new SelectListItem { Text = "Female", Value = "F" }
+                    }, "Please select", new { @id = "Gender" })
+                </td>
+            </tr>
+            <tr>
+                <td><label>Address</label></td>
+                <td>
+                    @Html.TextBoxFor(m => m.Address, new { @id = "Address" })
+                </td>
+            </tr>
+            <tr>
+                <td><label>Enrollment Date</label></td>
+                <td>
+                    @Html.TextBoxFor(m => m.EnrollmentDate, new { type = "date", @id = "EnrollmentDate" })
+                </td>
+            </tr>
+            <tr>
+                <td><label>Email</label></td>
+                <td>
+                    @Html.TextBoxFor(m => m.email, new { @id = "email" })
+                </td>
+            </tr>
+            <tr>
+                <td><label>Password</label></td>
+                <td>
+                    @Html.PasswordFor(m => m.password, new { @id = "password" })
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;">
+                    <button type="button" id="submitBtn">Submit</button>
+                </td>
+            </tr>
+        </table>
+
+
+
+        <p id="resultMsg" class="text-success">@ViewBag.Message</p>
+        <ul id="errorList" class="text-danger"></ul>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $("#submitBtn").click(function () {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            $("#resultMsg").text("").removeClass("text-success text-danger");
+            $("#errorList").empty();
+            $("#submitBtn").prop("disabled", true);
+            
+
+            //Collects all form values into a JavaScript object
+            var data = {
+                __RequestVerificationToken: token,
+                Name: $("#Name").val(),
+                Gender: $("#Gender").val(),
+                Address: $("#Address").val(),
+                EnrollmentDate: $("#EnrollmentDate").val(),
+                email: $("#email").val(),
+                password: $("#password").val()
+            };
+
+            $.ajax({
+                url: '/School/submittingForm',
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    $("#submitBtn").prop("disabled", false);
+                   
+
+                    if (response.success) {
+                        $("#resultMsg").text(response.message).addClass("text-success");
+                        $("#studentForm")[0].reset();
+                    } else {
+                        $("#resultMsg").text(response.message).addClass("text-danger");
+                        if (response.errors) {
+                            response.errors.forEach(function (error) {
+                                $("#errorList").append("<li>" + error + "</li>");
+                            });
+                        }
+                    }
+                },
+                error: function () {
+                    $("#submitBtn").prop("disabled", false);
+                    $("#resultMsg")
+                        .text("An unexpected error occurred.")
+                        .removeClass("text-success")
+                        .addClass("text-danger");
+                }
+            });
+        });
+    </script>
+
+}
