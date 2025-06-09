@@ -23,7 +23,34 @@
             <td>@s.email</td>
             <td>
                 @Html.ActionLink("Edit", "EditStudent", "School", new { id = s.Id }, null)
+
+                <button onclick="deleteStudent(@s.Id)" class="btn btn-danger">Delete</button>
             </td>
         </tr>
     }
 </table>
+
+@section Scripts {
+    <script>
+        function deleteStudent(id) {
+            if (confirm("Are you sure you want to delete this student?")) {
+                $.ajax({
+                    url: '/School/DeleteStudent',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload(); // reload to reflect changes
+                        } else {
+                            alert("Failed to delete student.");
+                        }
+                    },
+                    error: function () {
+                        alert("Error occurred while deleting student.");
+                    }
+                });
+            }
+        }
+    </script>
+
