@@ -302,6 +302,7 @@
     <Content Include="Views\School\DisplayStudents.cshtml" />
     <Content Include="Views\School\EditStudent.cshtml" />
     <Content Include="Views\School\_StudentForm.cshtml" />
+    <Content Include="Views\School\editForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
