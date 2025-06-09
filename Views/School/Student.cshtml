@@ -8,73 +8,43 @@
 <div class="container">
     <form id="studentForm">
         @Html.AntiForgeryToken()
-        <table>
-            <tr>
-                <td><label>Name</label></td>
-                <td>
-                    @Html.TextBoxFor(m => m.Name, new { @id = "Name" })
-                </td>
-            </tr>
-            <tr>
-                <td><label>Gender</label></td>
-                <td>
-                    @Html.DropDownListFor(m => m.Gender, new List<SelectListItem>
-                    {
-                        new SelectListItem { Text = "Male", Value = "M" },
-                        new SelectListItem { Text = "Female", Value = "F" }
-                    }, "Please select", new { @id = "Gender" })
-                </td>
-            </tr>
-            <tr>
-                <td><label>Address</label></td>
-                <td>
-                    @Html.TextBoxFor(m => m.Address, new { @id = "Address" })
-                </td>
-            </tr>
-            <tr>
-                <td><label>Enrollment Date</label></td>
-                <td>
-                    @Html.TextBoxFor(m => m.EnrollmentDate, new { type = "date", @id = "EnrollmentDate" })
-                </td>
-            </tr>
-            <tr>
-                <td><label>Email</label></td>
-                <td>
-                    @Html.TextBoxFor(m => m.email, new { @id = "email" })
-                </td>
-            </tr>
-            <tr>
-                <td><label>Password</label></td>
-                <td>
-                    @Html.PasswordFor(m => m.password, new { @id = "password" })
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align: center;">
-                    <button type="button" id="submitBtn">Submit</button>
-                </td>
-            </tr>
-        </table>
 
-
+        @Html.Partial("_StudentForm", Model)
 
         <p id="resultMsg" class="text-success">@ViewBag.Message</p>
+
         <ul id="errorList" class="text-danger"></ul>
     </form>
+
 </div>
+
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
     <script>
-        $("#submitBtn").click(function () {
+
+        const $submitBtn = $("#submitBtn");
+        const $resultMsg = $("#resultMsg");
+        const $errorList = $("#errorList");
+        const $studentForm = $("#studentForm");
+
+        $submitBtn.click(function (e) {
+            e.preventDefault(); // Prevent default form post
+
+            //  Client-side validation
+            if (!$studentForm.valid()) {
+                return;
+            }
+
+            clearMessages();
+            //multi call on the server
+            $submitBtn.prop("disabled", true);
+
             var token = $('input[name="__RequestVerificationToken"]').val();
 
-            $("#resultMsg").text("").removeClass("text-success text-danger");
-            $("#errorList").empty();
-            $("#submitBtn").prop("disabled", true);
-            
-
-            //Collects all form values into a JavaScript object
             var data = {
                 __RequestVerificationToken: token,
                 Name: $("#Name").val(),
@@ -90,30 +60,47 @@
                 type: 'POST',
                 data: data,
                 success: function (response) {
-                    $("#submitBtn").prop("disabled", false);
-                   
+
+                    $submitBtn.prop("disabled", false);
 
                     if (response.success) {
-                        $("#resultMsg").text(response.message).addClass("text-success");
-                        $("#studentForm")[0].reset();
+                        showSuccessMessage(response.message);
+                        resetForm();
                     } else {
-                        $("#resultMsg").text(response.message).addClass("text-danger");
-                        if (response.errors) {
-                            response.errors.forEach(function (error) {
-                                $("#errorList").append("<li>" + error + "</li>");
-                            });
-                        }
+                        showErrorMessage(response.message);
+                        showErrors(response.errors);
                     }
                 },
-                error: function () {
-                    $("#submitBtn").prop("disabled", false);
-                    $("#resultMsg")
-                        .text("An unexpected error occurred.")
-                        .removeClass("text-success")
-                        .addClass("text-danger");
-                }
+                error: handleError
             });
         });
+        // Helper function to clear messages
+        function clearMessages() {
+            $resultMsg.text("").removeClass("text-success text-danger");
+            //if we click multile times
+            $errorList.empty();
+        }
+        function resetForm() {
+            $studentForm[0].reset();
+            $(".field-validation-error").empty();
+        }
+        function showSuccessMessage(message) {
+            $resultMsg.text(message).addClass("text-success");
+        }
+
+        function showErrorMessage(message) {
+            $resultMsg.text(message).addClass("text-danger");
+        }
+        function handleError() {
+            $submitBtn.prop("disabled", false);
+            showErrorMessage("An unexpected error occurred.");
+        }
+        function showErrors(errors) {
+            if (errors && errors.length > 0) {
+                errors.forEach(function (error) {
+                    $errorList.append("<li>" + error + "</li>");
+                });
+            }
+        }
     </script>
 
-}

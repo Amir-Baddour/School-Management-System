@@ -3,42 +3,14 @@
 @{
     ViewBag.Title = "Edit Student";
 }
-
 <h2>Edit Student Details</h2>
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
 @using (Html.BeginForm("EditStudent", "School", FormMethod.Post))
 {
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.EnrollmentDate)
 
+    @Html.Partial("EditingForm", Model)
 
-    <table>
-        <tr>
-            <td>Name:</td>
-            <td>@Html.TextBoxFor(m => m.Name)</td>
-        </tr>
-        <tr>
-            <td>Gender:</td>
-            <td>@Html.TextBoxFor(m => m.Gender)</td>
-        </tr>
-        <tr>
-            <td>Address:</td>
-            <td>@Html.TextBoxFor(m => m.Address)</td>
-        </tr>
-       
- 
-        <tr>
-            <td>Email:</td>
-            <td>@Html.TextBoxFor(m => m.email)</td>
-        </tr>
-        <tr>
-            <td>Password:</td>
-            <td>@Html.PasswordFor(m => m.password)</td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <input type="submit" value="Save Changes" />
-            </td>
-        </tr>
-    </table>
 }

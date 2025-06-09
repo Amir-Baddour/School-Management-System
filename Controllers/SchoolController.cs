@@ -26,9 +26,9 @@ namespace Testing1.Controllers
         //This one is used to show the edit form with pre-filled data
         public ActionResult EditStudent(int id)
         {
-            using (SchoolDBEntities1 DB = new SchoolDBEntities1())
+            using (SchoolEntities DB = new SchoolEntities())
             {
-                var student = DB.Students.FirstOrDefault(s => s.Id == id);
+                var student = DB.Student.FirstOrDefault(s => s.Id == id);
                 if (student == null)
                 {
                     return HttpNotFound();
@@ -38,12 +38,12 @@ namespace Testing1.Controllers
         }
         //post editting
         //This one is used to handle form submission
-        [HttpPost]
-        public ActionResult EditStudent(Students updatedStudent)
+        /*[HttpPost]
+        public ActionResult EditStudent(StudentModel updatedStudent)
         {
-            using (SchoolDBEntities1 DB = new SchoolDBEntities1())
+            using (SchoolEntities DB = new SchoolEntities())
             {
-                var student = DB.Students.FirstOrDefault(s => s.Id == updatedStudent.Id);
+                var student = DB.Student.FirstOrDefault(s => s.Id == updatedStudent.Id);
                 if (student != null)
                 {
                     student.Name = updatedStudent.Name;
@@ -52,79 +52,156 @@ namespace Testing1.Controllers
                     student.email = updatedStudent.email;
                     student.password = updatedStudent.password;
 
-                    try
-                    {
-                        DB.SaveChanges();
-                    }
-                    catch (DbEntityValidationException ex)
-                    {
-                        foreach (var eve in ex.EntityValidationErrors)
-                        {
-                            foreach (var ve in eve.ValidationErrors)
-                            {
-                                System.Diagnostics.Debug.WriteLine($"Property: {ve.PropertyName}, Error: {ve.ErrorMessage}");
-                            }
-                        }
-                        throw;
-                    }
+                     DB.SaveChanges();
+                   
                 }
             }
 
+            return RedirectToAction("DisplayStudents");
+        }*/
+        [HttpPost]
+        public ActionResult EditStudent(Student student) // Change parameter to match your entity
+        {
+            using (SchoolEntities DB = new SchoolEntities())
+            {
+                try
+                {
+                    var dbStudent = DB.Student.FirstOrDefault(s => s.Id == student.Id);
+                    if (dbStudent != null)
+                    {
+                        dbStudent.Name = student.Name;
+                        dbStudent.Gender = student.Gender;
+                        dbStudent.Address = student.Address;
+                        dbStudent.email = student.email;
+                        dbStudent.password = student.password;
+                        DB.SaveChanges();
+                    }
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    // Get the error messages
+                    var errorMessages = ex.EntityValidationErrors
+                        .SelectMany(x => x.ValidationErrors)
+                        .Select(x => x.ErrorMessage);
+
+                    // Join the messages and log them or display to user
+                    string fullErrorMessage = string.Join("; ", errorMessages);
+
+                    // You can return this to the view or log it
+                    ModelState.AddModelError("", "Validation errors: " + fullErrorMessage);
+                    return View(student);
+                }
+            }
             return RedirectToAction("DisplayStudents");
         }
 
         //display students
         public ActionResult DisplayStudents()
         {
-            using (SchoolDBEntities1 DB = new SchoolDBEntities1())
+            using (SchoolEntities DB = new SchoolEntities())
             {
-                var studentList = DB.Students.ToList();
+                var studentList = DB.Student.ToList();
                 return View(studentList); // <- This will pass a List<Students> to the view
             }
         }
+
+
+
+        //delete
+        [HttpPost]
+        public ActionResult DeleteStudent(int id)
+        {
+            using (SchoolEntities db = new SchoolEntities())
+            {
+                // var student = db.Student.Where(s => s.Id == id).FirstOrDefault();
+
+                var student = db.Student.FirstOrDefault(s => s.Id == id);
+                if (student == null)
+                {
+                    return Json(new { success = false, message = "Student not found." });
+                }
+
+                db.Student.Remove(student);
+                db.SaveChanges();
+                return Json(new { success = true, message = "Student deleted successfully." });
+            }
+        }
+
         //Submitting form
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> submittingForm(StudentModel student)
+        public ActionResult submittingForm(StudentModel student)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                if (student.password.Length < 8)
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Validation failed",
-                        errors = new List<string> { "Password must be at least 8 characters." }
-                    });
-                }
+                var errors = ModelState.Values
+                                       .SelectMany(v => v.Errors)
+                                       .Select(e => e.ErrorMessage)
+                                       .ToList();
 
-                using (SchoolDBEntities1 DB = new SchoolDBEntities1())
+                return Json(new
                 {
-                    Students s = new Students
+                    success = false,
+                    message = "Validation failed",
+                    errors = errors
+                });
+            }
+
+            if (student.password.Length < 8)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = new List<string> { "Password must be at least 8 characters." }
+                });
+            }
+
+            using (SchoolEntities db = new SchoolEntities())
+            {
+                try
+                {
+                    var existingStudent = db.Student.FirstOrDefault(n => n.email == student.email);
+                    if (existingStudent != null)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Email already exists!",
+                            errors = new List<string> { "This email is already registered. Please use a different email." }
+                        });
+                    }
+
+                    Student s = new Student
                     {
                         Name = student.Name,
                         Gender = student.Gender,
                         Address = student.Address,
-                        EnrollmentDate = DateTime.Now,
+                        EnrollmentDate = student.EnrollmentDate,
                         email = student.email,
                         password = student.password
                     };
 
-                    DB.Students.Add(s);
-                    await DB.SaveChangesAsync(); // asynchronous call
+                    db.Student.Add(s);
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Student added successfully." });
+                }
+                catch (DbUpdateException ex)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Database error",
+                        errors = new List<string> { ex.Message }
+                    });
                 }
 
-                return Json(new { success = true, message = "Student successfully added!" });
             }
 
-            var errors = ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage)
-                .ToList();
 
-            return Json(new { success = false, message = "Validation failed", errors = errors });
         }
+
 
     }
 
