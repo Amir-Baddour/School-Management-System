@@ -1,0 +1,70 @@
+﻿
+@model Testing1.Models.StudentModel
+
+<table>
+    <tr>
+        <td>
+            <label>Name</label>
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @id = "Name" })
+            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Gender</label>
+        </td>
+        <td>
+            @Html.DropDownListFor(m => m.Gender,
+                      new List<SelectListItem> { new SelectListItem { Text = "Male", Value = "M" },
+                      new SelectListItem { Text = "Female", Value = "F" }
+                        }, "Please select", new { @id = "Gender" })
+            @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "text-danger" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Address</label>
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.Address, new { @id = "Address" })
+            @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Enrollment Date </label>
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.EnrollmentDate, new { type = "date", @id = "EnrollmentDate" })
+            @Html.ValidationMessageFor(m => m.EnrollmentDate, "", new { @class = "text-danger" })
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Email</label>
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.email, new { @id = "email" })
+            @Html.ValidationMessageFor(m => m.email, "", new { @class = "text-danger" })
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>Password</label>
+        </td>
+        <td>
+            @Html.PasswordFor(m => m.password, new { @id = "password" })
+            @Html.ValidationMessageFor(m => m.password, "", new { @class = "text-danger" })
+
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <button type="button" id="submitBtn" class="btn btn-primary">Submit</button>
+        </td>
+    </tr>
+</table>
