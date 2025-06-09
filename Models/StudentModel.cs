@@ -28,7 +28,8 @@ namespace Testing1.Models
         public string email { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
-        [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
         public string password { get; set; }
+
     }
 }
