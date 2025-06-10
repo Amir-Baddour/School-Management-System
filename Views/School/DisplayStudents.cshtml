@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Testing1.Students>
+﻿@model IEnumerable<Testing1.Student>
 @{
     ViewBag.Title = "Display Students";
 }
@@ -12,6 +12,8 @@
         <th>Enrollment Date</th>
         <th>Email</th>
         <th>Actions</th>
+        <th>Change Password</th>
+
     </tr>
     @foreach (var s in Model)
     {
@@ -26,6 +28,10 @@
 
                 <button onclick="deleteStudent(@s.Id)" class="btn btn-danger">Delete</button>
             </td>
+            <td>
+                @Html.ActionLink("Change Password", "ChangePassword", "School", new { id = s.Id }, null)
+            </td>
+
         </tr>
     }
 </table>
@@ -53,4 +59,4 @@
             }
         }
     </script>
-
+}
