@@ -27,5 +27,6 @@ namespace Testing1
     
         public virtual DbSet<Student> Student { get; set; }
         public virtual DbSet<Student_info> Student_info { get; set; }
+        public virtual DbSet<PasswordResetCodes> PasswordResetCodes { get; set; }
     }
 }

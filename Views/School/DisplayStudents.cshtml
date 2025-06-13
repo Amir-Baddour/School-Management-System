@@ -29,7 +29,7 @@
                 <button onclick="deleteStudent(@s.Id)" class="btn btn-danger">Delete</button>
             </td>
             <td>
-                @Html.ActionLink("Change Password", "ChangePassword", "School", new { id = s.Id }, null)
+                @Html.ActionLink("Change Password", "ChangePassword", new { id = s.Id }, new { @class = "btn btn-warning" })
             </td>
 
         </tr>

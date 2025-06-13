@@ -1,12 +1,17 @@
-﻿using System;
+﻿using BCrypt.Net; // Corrected the namespace
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
-using System.Web;
+using System.Web;   
 using System.Web.Mvc;
+using Testing1.Extensions; // Add this line at the top with other using directives
 using Testing1.Models;
+
 
 namespace Testing1.Controllers
 {
@@ -72,8 +77,6 @@ namespace Testing1.Controllers
                         dbStudent.Name = student.Name;
                         dbStudent.Gender = student.Gender;
                         dbStudent.Address = student.Address;
-                        dbStudent.email = student.email;
-                        dbStudent.password = student.password;
                         DB.SaveChanges();
                     }
                 }
@@ -179,7 +182,7 @@ namespace Testing1.Controllers
                         Address = student.Address,
                         EnrollmentDate = student.EnrollmentDate,
                         email = student.email,
-                        password = student.password
+                        password = BCrypt.Net.BCrypt.HashPassword(student.password) // Hash the password
                     };
 
                     db.Student.Add(s);
@@ -201,9 +204,70 @@ namespace Testing1.Controllers
 
 
         }
+        // Add these methods to your SchoolController class
 
+        // GET: Change Password Form
+        public ActionResult ChangePassword(int id)
+        {
+            using (SchoolEntities DB = new SchoolEntities())
+            {
+                var student = DB.Student.FirstOrDefault(s => s.Id == id);
+                if (student == null)
+                {
+                    return HttpNotFound();
+                }
 
+                // Pass student info via ViewBag properties
+                ViewBag.StudentId = student.Id;
+                ViewBag.StudentName = student.Name;
+                ViewBag.StudentEmail = student.email;
+                return View();
+            }
+        }
+
+        // POST: Handle Password Change
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangePassword(int id, string currentPassword, string newPassword)
+        {
+            using (SchoolEntities DB = new SchoolEntities())
+            {
+                try
+                {
+                    var student = DB.Student.FirstOrDefault(s => s.Id == id);
+                    if (student == null)
+                    {
+                        return Json(new { success = false, message = "Student not found." });
+                    }
+
+                    // Verify current password
+                    if(!BCrypt.Net.BCrypt.Verify(currentPassword, student.password))
+                    {
+                        return Json(new { success = false, message = "Current password is incorrect." });
+                    }
+
+                    // Validate new password
+                    if (string.IsNullOrEmpty(newPassword) || newPassword.Length < 8)
+                    {
+                        return Json(new { success = false, message = "New password must be at least 8 characters long." });
+                    }
+
+                    // Update password
+                    student.password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                    DB.SaveChanges();
+
+                    return Json(new { success = true, message = "Password changed successfully." });
+                }
+                catch (Exception)
+                {
+                    return Json(new { success = false, message = "An error occurred while changing the password." });
+                }
+            }
+        }
     }
-
-
+    
 }
+
+
+
+

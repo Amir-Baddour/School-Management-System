@@ -18,6 +18,7 @@ namespace Testing1
         public Student()
         {
             this.Student_info = new HashSet<Student_info>();
+            this.PasswordResetCodes = new HashSet<PasswordResetCodes>();
         }
     
         public int Id { get; set; }
@@ -30,5 +31,7 @@ namespace Testing1
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Student_info> Student_info { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<PasswordResetCodes> PasswordResetCodes { get; set; }
     }
 }

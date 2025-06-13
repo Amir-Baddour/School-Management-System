@@ -4,7 +4,17 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="SchoolModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="SchoolModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="PasswordResetCodes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StudentId" Type="int" Nullable="false" />
+          <Property Name="Code" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="IsUsed" Type="bit" Nullable="false" />
+        </EntityType>
         <EntityType Name="Student">
           <Key>
             <PropertyRef Name="Id" />
@@ -35,6 +45,18 @@ warning 6002: The table/view 'School.dbo.Student_info' does not have a primary k
           <Property Name="Class" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="emergency_contract" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
+        <Association Name="FK__PasswordR__Stude__2A4B4B5E">
+          <End Role="Student" Type="Self.Student" Multiplicity="1" />
+          <End Role="PasswordResetCodes" Type="Self.PasswordResetCodes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PasswordResetCodes">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Student_info_Student">
           <End Role="Student" Type="Self.Student" Multiplicity="1" />
           <End Role="Student_info" Type="Self.Student_info" Multiplicity="*" />
@@ -48,6 +70,7 @@ warning 6002: The table/view 'School.dbo.Student_info' does not have a primary k
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="SchoolModelStoreContainer">
+          <EntitySet Name="PasswordResetCodes" EntityType="Self.PasswordResetCodes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Student" EntityType="Self.Student" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Student_info" EntityType="Self.Student_info" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -59,13 +82,16 @@ warning 6002: The table/view 'School.dbo.Student_info' does not have a primary k
     [Student_info].[emergency_contract] AS [emergency_contract]
     FROM [dbo].[Student_info] AS [Student_info]</DefiningQuery>
           </EntitySet>
+          <AssociationSet Name="FK__PasswordR__Stude__2A4B4B5E" Association="Self.FK__PasswordR__Stude__2A4B4B5E">
+            <End Role="Student" EntitySet="Student" />
+            <End Role="PasswordResetCodes" EntitySet="PasswordResetCodes" />
+          </AssociationSet>
           <AssociationSet Name="FK_Student_info_Student" Association="Self.FK_Student_info_Student">
             <End Role="Student" EntitySet="Student" />
             <End Role="Student_info" EntitySet="Student_info" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="SchoolModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -81,6 +107,7 @@ warning 6002: The table/view 'School.dbo.Student_info' does not have a primary k
           <Property Name="email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Student_info" Relationship="Self.FK_Student_info_Student" FromRole="Student" ToRole="Student_info" />
+          <NavigationProperty Name="PasswordResetCodes" Relationship="SchoolModel.FK__PasswordR__Stude__2A4B4B5E" FromRole="Student" ToRole="PasswordResetCodes" />
         </EntityType>
         <EntityType Name="Student_info">
           <Key>
@@ -118,7 +145,35 @@ warning 6002: The table/view 'School.dbo.Student_info' does not have a primary k
             <End Role="Student" EntitySet="Student" />
             <End Role="Student_info" EntitySet="Student_info" />
           </AssociationSet>
+          <EntitySet Name="PasswordResetCodes" EntityType="SchoolModel.PasswordResetCodes" />
+          <AssociationSet Name="FK__PasswordR__Stude__2A4B4B5E" Association="SchoolModel.FK__PasswordR__Stude__2A4B4B5E">
+            <End Role="Student" EntitySet="Student" />
+            <End Role="PasswordResetCodes" EntitySet="PasswordResetCodes" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="PasswordResetCodes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentId" Type="Int32" Nullable="false" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsUsed" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Student" Relationship="SchoolModel.FK__PasswordR__Stude__2A4B4B5E" FromRole="PasswordResetCodes" ToRole="Student" />
+        </EntityType>
+        <Association Name="FK__PasswordR__Stude__2A4B4B5E">
+          <End Type="SchoolModel.Student" Role="Student" Multiplicity="1" />
+          <End Type="SchoolModel.PasswordResetCodes" Role="PasswordResetCodes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PasswordResetCodes">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -147,6 +202,17 @@ warning 6002: The table/view 'School.dbo.Student_info' does not have a primary k
                 <ScalarProperty Name="phone_num" ColumnName="phone_num" />
                 <ScalarProperty Name="Class" ColumnName="Class" />
                 <ScalarProperty Name="emergency_contract" ColumnName="emergency_contract" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PasswordResetCodes">
+            <EntityTypeMapping TypeName="SchoolModel.PasswordResetCodes">
+              <MappingFragment StoreEntitySet="PasswordResetCodes">
+                <ScalarProperty Name="IsUsed" ColumnName="IsUsed" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
